@@ -1,284 +1,192 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="referrer" content="no-referrer">
-    <title>可以理理我吗</title>
+    <title>前端Hardy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
         body {
+            background-color: #ffccd5;
+            color: #fff;
+            font-family: 'Indie Flower', cursive;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            background: #ffe6f2 linear-gradient(45deg, #ffb3d9, #ffe6f2);
-            font-family: 'Microsoft YaHei', sans-serif;
-            overflow: hidden;
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            max-width: 600px;
-            width: 90%;
             position: relative;
-            z-index: 1;
         }
 
-        .character {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
+        /* 保持原有定位结构 */
+        .flower {
             position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(255,51,133,0.2);
+            width: 60px;
+            height: 220px;
+            margin-top: -50px;
         }
 
-        .gif-emoji {
+        .flower .petal {
+            position: absolute;
+            background-color: #d52d58;
+            border-radius: 0px 30px 0px 30px;
+            width: 30px;
+            height: 60px;
+        }
+
+        /* 保持原始定位参数 */
+        .flower .petal:nth-child(1) {
+            left: -10px;
+            transform: rotate(-5deg); /* 初始角度更小 */
+            transform-origin: bottom right;
+            background-color: #b81b43;
+            animation: openleft 3s ease-in forwards;
+            z-index: 5;
+        }
+
+        .flower .petal:nth-child(2) {
+            left: -10px;
+            background-color: #c9204b;
+            z-index: 4;
+        }
+
+        .flower .petal:nth-child(3) {
+            border-radius: 30px;
+            left: 5px;
+        }
+
+        .flower .petal:nth-child(4) {
+            border-radius: 30px 0px 30px 0px;
+            background-color: #c9204b;
+            left: 20px;
+            z-index: 4;
+        }
+
+        .flower .petal:nth-child(5) {
+            border-radius: 30px 0px 30px 0px;
+            left: 20px;
+            transform: rotate(5deg); /* 初始角度更小 */
+            transform-origin: bottom left;
+            animation: openright 3s ease-in forwards;
+            background-color: #b81b43;
+            z-index: 5;
+        }
+
+        /* 保持花杆原始定位 */
+        .flower .rod {
+            background-color: #329932;
+            width: 5px;
+            height: 150px;
+            position: absolute;
+            left: 17.5px;
+            top: 58px;
+            z-index: -1;
+        }
+
+        .flower .rod::before {
+            background-color: lightgreen;
+            border-radius: 3px;
+            content: '';
+            display: block;
+            width: 20px;
+            height: 8px;
+            margin-left: -8px;
+        }
+
+        .flower .rod .spike {
+            width: 0;
+            height: 0;
+            position: absolute;
+            top: 20px;
+            left: -10px;
+            border-color: transparent #329932 transparent transparent;
+            border-style: solid;
+            border-width: 5px;
+        }
+
+        .flower .rod .spike:nth-child(2) {
+            top: 50px;
+            left: 4px;
+            border-color: transparent transparent transparent #329932;
+        }
+
+        .flower .rod .spike:nth-child(3) {
+            top: 80px;
+        }
+
+        .flower .rod .spike:nth-child(4) {
+            top: 110px;
+            left: 4px;
+            border-color: transparent transparent transparent #329932;
+        }
+
+        /* 仅修改动画参数 */
+        @keyframes openleft {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(-20deg); }
+        }
+
+        @keyframes openright {
+            0% { transform: rotate(5deg); }
+            100% { transform: rotate(20deg); }
+        }
+
+        /* 同步文字动画时间 */
+        .text-container {
+            position: absolute;
+            top: calc(50% + 150px);
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.5s;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1s 3.5s forwards; /* 延迟调整为3.5秒 */
         }
 
-        .message-box {
-            min-height: 60px;
-            margin: 20px 0;
-            font-size: 1.2em;
-            color: #ff3385;
-            animation: fadeInUp 0.5s;
-            position: relative;
-            z-index: 2;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        button {
-            padding: 20px 50px;
-            font-size: 1.3em;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 150px;
-            transform-origin: center;
-            position: relative;
-        }
-
-        #yesBtn {
-            background: linear-gradient(145deg, #66bb6a, #4CAF50);
-            color: white;
-            box-shadow: 0 4px 15px rgba(76,175,80,0.3);
-        }
-
-        #noBtn {
-            background: linear-gradient(145deg, #ff4444, #cc0000);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255,68,68,0.3);
-        }
-
-        #success {
-            display: none;
-            font-size: 1.5em;
-            color: #ff3385;
-            margin-top: 30px;
-            line-height: 1.5;
-            animation: fadeIn 1s;
-            position: relative;
-            z-index: 2;
+        .text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            font-size: 24px;
+            color: #d52d58;
+            border-right: 2px solid transparent;
+            animation: 
+                typing 2s steps(7) 3.5s forwards,
+                blinkCaret 0.5s step-end 3.5s 6;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0 }
+            to { opacity: 1 }
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 200px }
         }
 
-        /* 新增爱心动画关键帧 */
-        @keyframes heartFloat {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translateY(-100px) rotate(180deg) scale(1.2);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-200px) rotate(360deg) scale(0.5);
-            }
-        }
-
-        @keyframes fallDown {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-            }
+        @keyframes blinkCaret {
+            from, to { border-color: transparent }
+            50% { border-color: #d52d58 }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="character" id="character">
-            <img src="https://cdn.jsdelivr.net/gh/wsWsrr/luoxiaoli@main/.github/workflows/emoji1.gif" 
-                 class="gif-emoji"
-                 alt="道歉表情"
-                 onerror="handleImageError(this)">
-        </div>
-        <div class="message-box" id="messageBox">可以跟我和好吗？😢</div>
-        <div class="buttons">
-            <button id="yesBtn" onclick="showSuccess()">我 原 谅 你</button>
-            <button id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()" onclick="shrinkButton()">不 原 谅</button>
-        </div>
-        <div id="success">
-            🌈 太好了！我们和好了～<br>
-            以后一定不会再让你生气了！💞
+    <div class="flower">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="rod">
+            <div class="spike"></div>
+            <div class="spike"></div>
+            <div class="spike"></div>
+            <div class="spike"></div>
         </div>
     </div>
-
-    <script>
-        const basePath = 'https://cdn.jsdelivr.net/gh/wsWsrr/luoxiaoli@main/.github/workflows/';
-        const apologyEmotions = Array.from({length: 9}, (_, i) => `${basePath}emoji${i+1}.gif`);
-        const happyEmotion = `${basePath}emoji10.gif`;
-        const messages = [
-            "可以跟我和好吗？😢",
-            "真的不原谅我吗...😞",
-            "我知道错了...😭",
-            "眼泪要流干了...💔",
-            "要怎样才肯原谅我...😭",
-            "跪下来道歉可以吗...🧎",
-            "真的知道错了...😫",
-            "心要碎成二维码了...💔",
-            "要变成流浪猫猫了...🐾"
-        ];
-
-        let currentLevel = 0;
-        let yesScale = 1;
-        const maxApologyLevel = apologyEmotions.length - 1;
-
-        function enforceScaling() {
-            yesScale *= 1.2;
-            document.getElementById("yesBtn").style.transform = `scale(${yesScale})`;
-        }
-
-        function shrinkButton() {
-            enforceScaling();
-            if(currentLevel < maxApologyLevel) {
-                currentLevel++;
-                updateDisplay();
-                moveButton();
-            }
-        }
-
-        function updateDisplay() {
-            const newImg = new Image();
-            newImg.className = 'gif-emoji';
-            newImg.src = apologyEmotions[currentLevel];
-            newImg.onerror = () => handleImageError(newImg);
-            character.innerHTML = '';
-            character.appendChild(newImg);
-
-            const msgIndex = Math.min(currentLevel, messages.length-1);
-            messageBox.textContent = messages[msgIndex];
-            messageBox.style.animation = 'none';
-            void messageBox.offsetWidth;
-            messageBox.style.animation = 'fadeInUp 0.5s';
-
-            const progress = currentLevel / maxApologyLevel;
-            document.getElementById("noBtn").style.transform = `scale(${1 - progress * 0.7})`;
-        }
-
-        function moveButton() {
-            const noBtn = document.getElementById("noBtn");
-            const maxMove = 50 - (currentLevel * 3);
-            const moveX = (Math.random() * maxMove * 2) - maxMove;
-            const moveY = (Math.random() * maxMove * 2) - maxMove;
-            noBtn.style.transform = `translate(${moveX}px, ${moveY}px) scale(${1 - (currentLevel/maxApologyLevel)*0.7})`;
-        }
-
-        function showSuccess() {
-            document.querySelector(".buttons").style.display = "none";
-            document.getElementById("success").style.display = "block";
-            messageBox.style.display = "none";
-            
-            const successImg = new Image();
-            successImg.className = 'gif-emoji';
-            successImg.src = happyEmotion;
-            character.innerHTML = '';
-            character.appendChild(successImg);
-
-            createHearts();
-        }
-
-        function createHearts() {
-            const heartEmojis = ['💖', '💕', '💞', '💓', '💗'];
-            
-            // 快速上升爱心
-            for(let i=0; i<15; i++){
-                createHeart(heartEmojis, {
-                    animation: `heartFloat ${Math.random()*2 + 1}s ease-out infinite, 
-                                fallDown ${Math.random()*5 + 5}s linear infinite`,
-                    startPos: '100%',
-                    fontSize: 20 + Math.random()*30,
-                    filter: 'drop-shadow(0 0 2px rgba(255,51,133,0.5))'
-                });
-            }
-
-            // 缓慢飘落爱心
-            for(let i=0; i<10; i++){
-                createHeart(heartEmojis, {
-                    animation: `fallDown ${Math.random()*10 + 10}s linear infinite`,
-                    startPos: '-50px',
-                    fontSize: 10 + Math.random()*20,
-                    opacity: 0.7
-                });
-            }
-        }
-
-        function createHeart(emojis, options) {
-            const heart = document.createElement('div');
-            heart.innerHTML = emojis[Math.floor(Math.random()*emojis.length)];
-            heart.style.cssText = `
-                position: fixed;
-                left: ${Math.random()*100}%;
-                top: ${options.startPos};
-                font-size: ${options.fontSize}px;
-                animation: ${options.animation};
-                pointer-events: none;
-                z-index: 999;
-                opacity: ${options.opacity || 1};
-                filter: ${options.filter || 'none'};
-            `;
-            document.body.appendChild(heart);
-        }
-
-        function handleImageError(img) {
-            console.error('图片加载失败:', img.src);
-            img.style.display = 'none';
-            character.style.backgroundColor = '#fff';
-            character.innerHTML = '<div style="color:#ff3385;padding:20px">😭 表情加载失败，但我的歉意是真的！</div>';
-        }
-
-        (function init() {
-            [...apologyEmotions, happyEmotion].forEach(src => new Image().src = src);
-        })();
-    </script>
+    
+    <div class="text-container">
+        <div class="text">蒋文宇</div>
+    </div>
 </body>
 </html>
